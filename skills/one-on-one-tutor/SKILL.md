@@ -105,11 +105,54 @@ description: >
 
 当用户提供非 markdown 格式的文件（如 PDF、Word、PPT、Excel 等）时：
 
-1. **先转换格式**：使用 `mcp__markitdown__convert_to_markdown` 工具将文件转换为 markdown
+**第一步：检查 markitdown 是否可用**
+
+尝试调用 `mcp__markitdown__convert_to_markdown`。如果工具不存在或调用失败，进入安装引导流程（见下方）。
+
+**第二步：转换格式**
+
+如果工具可用：
+1. 使用 `mcp__markitdown__convert_to_markdown` 将文件转换为 markdown
    - 支持的格式：PDF、Word (.docx)、PowerPoint (.pptx)、Excel (.xlsx)、图片、HTML 等
    - 使用方式：传入文件的 `file://` URI（如 `file:///path/to/file.pdf`）
-2. **确认转换结果**：告诉用户已将文件转换为 markdown，可以开始学习
-3. **按下方流程继续**处理转换后的 markdown 内容
+2. 告诉用户已将文件转换为 markdown，可以开始学习
+3. 按下方流程继续处理转换后的 markdown 内容
+
+**如果 markitdown 未安装 — 引导安装：**
+
+告知用户需要安装 markitdown MCP 服务器来支持文件格式转换，然后按以下步骤引导：
+
+1. **安装 markitdown 工具**：
+   ```
+   pip install markitdown
+   ```
+   （如用户使用 uv：`uv tool install markitdown`）
+
+2. **配置 MCP 服务器**：
+   在项目的 `.claude/settings.json` 中添加：
+   ```json
+   {
+     "mcpServers": {
+       "markitdown": {
+         "command": "markitdown",
+         "args": ["--mcp"]
+       }
+     }
+   }
+   ```
+   或在全局 `~/.claude/settings.json` 中添加（对所有项目生效）。
+
+3. **验证安装**：
+   让用户运行 `claude mcp list` 确认 markitdown 服务器已注册。
+
+4. **重启 Claude Code**：MCP 服务器配置变更需要重启才能生效。
+
+安装完成后，重新提供文件即可继续学习流程。
+
+**降级方案**（用户无法安装 markitdown 时）：
+- 如果是 PDF：建议用户复制粘贴关键内容文本
+- 如果是 Word/PPT：建议用户导出为纯文本或 markdown 后提供
+- 如果是图片：直接使用 Claude 的多模态能力读取图片内容
 
 #### 学习流程
 
